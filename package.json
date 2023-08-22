@@ -1,0 +1,49 @@
+{
+  "private": true,
+  "name": "remix-starter-template",
+  "description": "",
+  "license": "",
+  "scripts": {
+    "clean": "rm -rf build public/build",
+    "prebuild": "npm run clean",
+    "build": "remix build",
+    "predev": "npm run clean && npm run css:generate",
+    "dev": "run-p dev:*",
+    "dev:remix": "remix dev",
+    "dev:tailwind": "npm run css:generate -- --watch",
+    "css:generate": "tailwindcss -o ./app/styles/tailwind.css",
+    "start": "cross-env NODE_ENV=production npm run build && remix-serve build"
+  },
+  "dependencies": {
+    "@remix-run/node": "^1.11.1",
+    "@remix-run/react": "^1.11.1",
+    "@remix-run/serve": "^1.11.1",
+    "@turf/random": "^6.5.0",
+    "@types/geojson": "^7946.0.10",
+    "axios": "^1.4.0",
+    "isbot": "^3.6.5",
+    "lodash": "^4.17.21",
+    "mapbox-gl": "^2.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.1"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^1.11.1",
+    "@remix-run/eslint-config": "^1.11.1",
+    "@types/lodash": "^4.14.197",
+    "@types/mapbox-gl": "^2.7.13",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.8",
+    "cross-env": "7.0.3",
+    "eslint": "^8.27.0",
+    "npm-run-all": "4.1.5",
+    "tailwindcss": "3.2.4",
+    "typescript": "^4.8.4"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "sideEffects": false,
+  "keywords": []
+}
