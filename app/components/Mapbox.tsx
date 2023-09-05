@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ReactNode,
+  useCallback,
 } from "react";
 import {
   FeatureCollection,
@@ -34,6 +35,7 @@ import axios from "axios";
 import { LayerStyles, MapLayers, MapSources } from "~/config.map";
 import { loader as routesLoader } from '~/routes/api.map.routes'
 import { loader as stopsLoader } from '~/routes/api.map.stops'
+import { useEffectOnce } from "~/lib/hooks";
 
 export { mapboxCss };
 export type SourceType = { id: string; data: GeoJSONSourceRaw["data"] };
@@ -123,6 +125,7 @@ export const useMapBox = () => {
   return map;
 };
 
+
 export const useMapBoxStore = (initData: {
   options: Omit<MapboxOptions, "container">;
   MAPBOX_API_KEY: string;
@@ -133,24 +136,28 @@ export const useMapBoxStore = (initData: {
   const { MAPBOX_API_KEY, state, options } = initData;
 
   useEffect(() => {
-    if (mapContainerRef.current) {
-      if (!store) {
-        setStore(
-          new MapBoxStore(MAPBOX_API_KEY, state, mapContainerRef, options)
-        );
-      } else {
-        if (options.bounds)
-          store.map.fitBounds(options.bounds, { padding: 20 });
-        if (options.center && options.zoom) store.map.setCenter(options.center);
-        if (state.sources) {
-          for (const [key, source] of Object.entries(state.sources)) {
-            const mapSource = store.map.getSource(key) as GeoJSONSource;
-            if (mapSource) mapSource.setData(source.data);
-          }
+    if (store) {
+      if (options.bounds)
+        store.map.fitBounds(options.bounds, { padding: 20 });
+      if (options.center && options.zoom) store.map.setCenter(options.center);
+      if (state.sources) {
+        for (const [key, source] of Object.entries(state.sources)) {
+          const mapSource = store.map.getSource(key) as GeoJSONSource;
+          if (mapSource) mapSource.setData(source.data);
         }
       }
     }
-  }, [mapContainerRef, state]);
+  }, [state]);
+
+  const initialize = useCallback(() => {
+    if (mapContainerRef.current && !store?.map) {
+      const mapImpl = new MapBoxStore(MAPBOX_API_KEY, state, mapContainerRef, options)
+      setStore(mapImpl);
+    }
+  }, [mapContainerRef, store?.map, options]);
+
+  useEffectOnce(initialize);
+
   return { mapContainerRef: mapContainerRef, store: store };
 };
 
@@ -282,6 +289,7 @@ export const zBoundsUpdate = zJsonCheck.transform(
   (data) =>
     zBounds.parse(JSON.parse(data)) as [[number, number], [number, number]]
 );
+
 export const BoundsUpdate = () => {
   const { map } = useMapBox();
 
@@ -341,12 +349,11 @@ export function StopsLayer() {
     });
   };
 
-  useEffect(() => {
     getRoutesAndStops();
-  }, []);
 
   return null;
 }
+
 export function RoutesLayer() {
   const mapbox = useMapBox();
   const getRoutes = async () => {
@@ -367,9 +374,8 @@ export function RoutesLayer() {
     }
   };
 
-  useEffect(() => {
-    getRoutes();
-  }, []);
+  getRoutes();
 
   return null;
 }
+
