@@ -15,6 +15,7 @@
     "start": "cross-env NODE_ENV=production npm run build && remix-serve build"
   },
   "dependencies": {
+    "@prisma/client": "^5.4.2",
     "@react-hookz/web": "^23.1.0",
     "@remix-run/node": "^1.11.1",
     "@remix-run/react": "^1.11.1",
@@ -22,13 +23,14 @@
     "@turf/random": "^6.5.0",
     "@types/geojson": "^7946.0.10",
     "axios": "^1.4.0",
-    "drizzle-orm": "^0.28.5",
+    "drizzle-orm": "^0.28.6",
     "drizzle-zod": "^0.5.1",
     "isbot": "^3.6.5",
     "lodash": "^4.17.21",
     "mapbox-gl": "^2.15.0",
     "pg": "^8.11.3",
     "postgres": "^3.4.0",
+    "prisma": "^5.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "zod": "^3.22.1"

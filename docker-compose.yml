@@ -4,9 +4,7 @@ services:
   db:
     image: supabase/postgres
     ports:
-      - '5482:5432'
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+      - "5442:5432"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf 
     environment:
       POSTGRES_PASSWORD: postgres
-        - ./data/redis:/data
-
