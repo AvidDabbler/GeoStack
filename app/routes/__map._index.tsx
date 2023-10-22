@@ -1,3 +1,3 @@
 export default function MapIndex() {
-  return <div></div>
+  return <div>didk aopisdnf oinasdniof noik</div>
 }
