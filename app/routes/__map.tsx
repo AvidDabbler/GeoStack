@@ -3,18 +3,12 @@ import { Outlet, useLoaderData } from '@remix-run/react'
 import {
   BoundsUpdate,
   MapComponent,
-  RoutesLayer,
-  SourceDataType,
   StopsLayer,
   mapboxCss,
 } from '~/components/Mapbox'
-import { LayerStyles, MapLayers, MapSources } from '~/config.map'
 import { MAPBOX_API_KEY } from '~/lib/config.server'
-import { getUserSession } from '~/session/session.server'
-import { randomPoint } from '@turf/random'
 import type { LinksFunction, V2_MetaFunction } from '@remix-run/node' // or cloudflare/deno
 import { userAuthorized } from '~/lib/auth'
-import { database, tables } from 'drizzle'
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -26,27 +20,17 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export async function loader({ request }: LoaderArgs) {
-  const { mapSettings } = await getUserSession(request)
-
+export async function loader() {
   if (!userAuthorized()) throw Error('USER NOT ALLOWED')
 
-  const features = randomPoint(100, {
-    bbox: [-90.514641, 38.490144, -89.995537, 38.713108],
-  })
   const bounds = [
     [-90.514641, 38.490144],
     [-89.995537, 38.713108],
   ] as [[number, number], [number, number]]
-  const points = { features, bounds }
-
-  const routes = await database.select().from(tables.routes).limit(4)
 
   return json({
     MAPBOX_API_KEY,
-    bounds: mapSettings.bounds ?? points.bounds,
-    pointFeatures: points.features,
-    routes,
+    bounds,
   })
 }
 
@@ -55,37 +39,19 @@ export const links: LinksFunction = () => {
 }
 
 export default function Index() {
-  const { MAPBOX_API_KEY, pointFeatures, bounds, routes } =
-    useLoaderData<typeof loader>()
-  console.log(routes)
+  const { MAPBOX_API_KEY, bounds } = useLoaderData<typeof loader>()
   return (
     <MapComponent
       className="h-full w-full bg-gray-500"
       MAPBOX_API_KEY={MAPBOX_API_KEY}
       options={{ bounds }}
       initState={{
-        layers: {
-          [MapLayers.points]: LayerStyles.pointsLayerStyle,
-          [MapLayers.pointsCluster]: LayerStyles.pointsClusterLayerStyle,
-          [MapLayers.pointsClusterCount]:
-            LayerStyles.pointsClusterCountLayerStyle,
-        },
-        sources: {
-          [MapSources.points]: {
-            data: pointFeatures,
-            id: MapSources.points,
-            name: MapSources.points,
-            type: 'geojson',
-            cluster: true,
-            clusterMaxZoom: 14, // Max zoom to cluster points on
-            clusterRadius: 20,
-          } as SourceDataType,
-        },
+        layers: {},
+        sources: {},
       }}
     >
       <BoundsUpdate />
       <StopsLayer />
-      <RoutesLayer />
       <Outlet />
     </MapComponent>
   )

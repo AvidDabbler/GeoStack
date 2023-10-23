@@ -1,5 +1,11 @@
 # Remix Mapbox Starter Template
 
+## ⚠️ Work in Progress Use at your own risk ⚠️
+
+Currently this is a repo that is meant to hold the findings of working with geospatial applications on the Remix stack. Current issues that are being worked through revolve around the issues with working with the style of fetching and revalidation of data. This is not always wanted on the geospatial stack since a lot of the queries that are executed are intensive and would punish the user for revalidation for items that are probably not updated.
+
+The result at the moment is to still make use the of the js fetch function when you are fetching data and do this function on "client side" after the map is loaded. Since a solution for holding the data has not been found for storing and caching large amounts of geojson has been found currently.
+
 Working with mapbox is hard especially in React. But with Remix you have a little bit more control over your data and and when you are loading it onto the map canvas.
 
 Using the loader function allows you to get the data asyncronously before the page even begins to load on the server. Then the page will render what the server can and will be sent over to the client. Then when your payload from the server is sent to the client the client can begin to load the css and canvas that is needed to initialize the map.

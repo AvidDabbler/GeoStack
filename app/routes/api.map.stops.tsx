@@ -1,18 +1,47 @@
-import { json } from "@remix-run/node"
-import { randomPoint } from '@turf/random'
-import { SourceDataType } from "~/components/Mapbox"
-import { MapSources } from "~/config.map"
-import { userAuthorized } from "~/lib/auth"
+import { json } from '@remix-run/node'
+import { database, tables } from 'drizzle'
+import { and, isNotNull } from 'drizzle-orm'
+import { Feature, Point } from 'geojson'
+import { SourceDataType } from '~/components/Mapbox'
+import { MapSources } from '~/config.map'
+import { userAuthorized } from '~/lib/auth'
 
 export async function loader() {
-  if (!userAuthorized()) throw new Error("USER IS NOT AUTHORIZED")
-  const features = randomPoint(70, { bbox: [-90.514641, 38.490144, -89.995537, 38.713108] })
+  if (!userAuthorized()) throw new Error('USER IS NOT AUTHORIZED')
+
+  const stops = await database
+    .select()
+    .from(tables.stops)
+    .where(
+      and(
+        isNotNull(tables.stops.stopLat),
+        isNotNull(tables.stops.stopLon),
+        isNotNull(tables.stops.stopId),
+      ),
+    )
+  const features: Feature<Point>[] = stops.map((stop) => {
+    const { stopLat, stopLon, ...properties } = stop
+    return {
+      type: 'Feature',
+      properties: {
+        stop_id: properties.stopId ?? '',
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: [stopLon, stopLat],
+      },
+    }
+  })
+
   return json({
     stopsSource: {
       id: MapSources.stopsSource,
       name: MapSources.stopsSource,
-      type: "geojson",
-      data: features
-    } as SourceDataType & { name: string; id: string }
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features,
+      },
+    } as SourceDataType & { name: string; id: string },
   })
 }
