@@ -19,7 +19,7 @@ export async function loader() {
         isNotNull(tables.stops.stopId),
       ),
     )
-  const features: Feature<Point>[] = stops.map((stop) => {
+  const features = stops.map((stop) => {
     const { stopLat, stopLon, ...properties } = stop
     return {
       type: 'Feature',
