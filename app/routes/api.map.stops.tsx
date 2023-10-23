@@ -1,7 +1,6 @@
 import { json } from '@remix-run/node'
 import { database, tables } from 'drizzle'
 import { and, isNotNull } from 'drizzle-orm'
-import { Feature, Point } from 'geojson'
 import { SourceDataType } from '~/components/Mapbox'
 import { MapSources } from '~/config.map'
 import { userAuthorized } from '~/lib/auth'

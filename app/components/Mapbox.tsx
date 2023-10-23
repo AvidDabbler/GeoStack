@@ -196,9 +196,6 @@ export class MapBoxStore {
       ...options,
     })
     this.map.on('load', () => {
-      console.log('initlayers', initialState.layers)
-      console.log('initsources', initialState.sources)
-
       for (const [id, source] of Object.entries(initialState.sources)) {
         if (!this.map.getSource(id)) this.addSourceToState(id, source)
       }
@@ -262,7 +259,6 @@ export class MapBoxStore {
         const beforeLoaded = _beforeId
           ? this.map.getLayer(_beforeId)
           : undefined
-        console.log({ beforeLoaded })
         this.map.addLayer(
           layer,
           beforeLoaded === undefined ? undefined : beforeId,
@@ -356,15 +352,11 @@ export function StopsLayer() {
       const response = await axios.get('/api/map/stops')
 
       const { stopsSource } = response.data
-      console.log({ stopsSource })
-
       mapbox.addSourceToState(
         MapSources.stopsSource,
         stopsSource as SourceDataType,
       )
       mapbox.addLayerToState(LayerStyles.stopsLayerStyle, MapLayers.points)
-
-      console.log('stops loaded')
     })
   }
 
@@ -379,8 +371,6 @@ export function RoutesLayer() {
     try {
       mapbox.map.once('idle', async () => {
         const response = await axios.get('/api/map/routes')
-        console.log(response)
-
         const { routesSource } = response.data
         mapbox.addSourceToState(
           MapSources.routesSource,
@@ -392,8 +382,6 @@ export function RoutesLayer() {
             MapLayers.stopsLayer,
           )
         else mapbox.addLayerToState(LayerStyles.routesLayerStyle)
-
-        console.log('routes loaded')
       })
     } catch (e) {
       console.error(e)

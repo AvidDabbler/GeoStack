@@ -54,7 +54,6 @@ const stopsGeomUpdate = async (agencyId: string) => {
   const query = `
   update stops
   set geom = ST_SetSRID(ST_MakePoint(stop_lon, stop_lat),4326)`
-  console.log(query)
   await pgClient.query(`
                   update stops
                   set geom = ST_SetSRID(ST_MakePoint(stop_lon, stop_lat),4326)`)
@@ -102,7 +101,6 @@ const execInsertTransaction = async (
       await t.none(insertStatement)
     })
     .catch((err) => {
-      console.log(err)
       console.error(`issue with updating ${tableName}`)
     })
 }
